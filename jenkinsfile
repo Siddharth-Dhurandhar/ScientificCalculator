@@ -1,0 +1,46 @@
+pipeline {
+    agent any
+    environment {
+        DOCKER_IMAGE = "siddharth610/scientific-calculator:v1"
+    }
+    stages {
+        stage('Clone Repository') {
+            steps {
+                git branch: 'main', url: 'https://github.com/Siddharth-Dhurandhar/ScientificCalculator.git'
+            }
+        }
+        stage('Build Docker Image') {
+            steps {
+                sh 'docker build -t sci-cal .'
+            }
+        }
+        stage('Verify Docker image') {
+            steps {
+                sh 'docker images'
+            }
+        }
+        stage('Push to Docker Hub') {
+            steps {
+                withCredentials([usernamePassword(credentialsId: 'docker-hub-credentials', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
+                    sh 'echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin'
+                    sh 'docker tag java-cal $DOCKER_IMAGE'
+                    sh 'docker images'
+                    sh 'docker push $DOCKER_IMAGE'
+                }
+            }
+        }
+        stage('Deploy with ansible') {
+            steps {
+                withCredentials([
+                    string(credentialsId: 'ANSIBLE_SUDO_PASS', variable: 'ANSIBLE_BECOME_PASS'),
+                    string(credentialsId: 'ANSIBLE_SUDO_PASS', variable: 'ANSIBLE_SSH_PASS')
+                ]) {
+                    // sh 'cd scientific-calculator'
+                    sh '''
+                    ansible-playbook -i inventory.ini deploy.yml --extra-vars "ansible_ssh_pass=$ANSIBLE_SSH_PASS ansible_become_pass=$ANSIBLE_BECOME_PASS"
+                    '''
+                }
+            }
+        }
+    }
+}
