@@ -14,8 +14,8 @@
 
     - name: Stop and remove any existing container with the same name
       shell: |
-        docker stop dev-cal || true
-        docker rm dev-cal || true
+        docker stop sci-cal || true
+        docker rm sci-cal || true
       ignore_errors: yes
 
     - name: Run the Docker container
