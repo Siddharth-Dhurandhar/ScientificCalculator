@@ -24,7 +24,7 @@ pipeline {
             steps {
                 withCredentials([string(credentialsId: 'DockerHubCred', variable: 'DOCKER_HUB_PASSWORD')]) {
                     sh 'echo $DOCKER_HUB_PASSWORD | docker login -u $DOCKER_HUB_USERNAME --password-stdin'
-                    sh 'docker tag java-cal $DOCKER_IMAGE'
+                    sh 'docker tag sci-cal $DOCKER_IMAGE'
                     sh 'docker images'
                     sh 'docker push $DOCKER_IMAGE'
                 }
