@@ -1,5 +1,9 @@
 pipeline {
     agent any
+
+    tools {
+        maven 'maven3'
+    }
     environment {
         DOCKER_HUB_USERNAME = 'siddharth610'
         DOCKER_IMAGE = "siddharth610/scientific-calculator:v1"
@@ -8,6 +12,12 @@ pipeline {
         stage('Clone Repository') {
             steps {
                 git branch: 'main', url: 'https://github.com/Siddharth-Dhurandhar/ScientificCalculator.git'
+            }
+        }
+        stage('Build & Test') {
+            steps {
+                sh 'mvn clean test'
+                sh 'mvn package'
             }
         }
         stage('Build Docker Image') {
