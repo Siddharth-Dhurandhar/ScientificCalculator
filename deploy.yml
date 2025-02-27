@@ -1,0 +1,28 @@
+- name: Deploy Calculator Container Using Docker CLI
+  hosts: localhost
+  remote_user: siddharth-dhurandhar
+  become: yes
+  tasks:
+    - name: Pull the latest Docker image from Docker Hub
+      shell: docker pull siddharth610/scientific-calculator:v1
+      register: pull_result
+      changed_when: "'Downloaded newer image' in pull_result.stdout or 'Pull complete' in pull_result.stdout"
+
+    - name: Display Pull Result
+      debug:
+        var: pull_result.stdout
+
+    - name: Stop and remove any existing container with the same name
+      shell: |
+        docker stop dev-cal || true
+        docker rm dev-cal || true
+      ignore_errors: yes
+
+    - name: Run the Docker container
+      shell: docker run -it -d --name sci-cal siddharth610/scientific-calculator:v1
+      register: run_result
+      changed_when: "'Error' not in run_result.stderr"
+
+    - name: Display Container Run Result
+      debug:
+        var: run_result.stdout
