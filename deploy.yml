@@ -19,7 +19,7 @@
       ignore_errors: yes
 
     - name: Run the Docker container
-      shell: docker run -it -d --name sci-cal siddharth610/scientific-calculator:v1
+      shell: docker run -it --name sci-cal siddharth610/scientific-calculator:v1
       register: run_result
       changed_when: "'Error' not in run_result.stderr"
 
